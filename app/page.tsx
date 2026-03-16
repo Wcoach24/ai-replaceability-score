@@ -6,6 +6,7 @@ import Loading from '@/components/Loading';
 import Result from '@/components/Result';
 import EmailGate from '@/components/EmailGate';
 import { calculateScore } from '@/lib/scoring';
+import type { ScoringResult } from '@/lib/scoring';
 
 type AppState = 'landing' | 'loading' | 'result' | 'emailGate';
 
@@ -15,20 +16,12 @@ interface FormData {
   experiencia: number;
 }
 
-interface ScoreResult {
-  score: number;
-  timeline: string;
-  riskLevel: 'bajo' | 'medio' | 'alto' | 'muy alto';
-  factors: string[];
-}
-
 export default function Home() {
   const [state, setState] = useState<AppState>('landing');
   const [counter, setCounter] = useState(12000);
   const [formData, setFormData] = useState<FormData | null>(null);
-  const [result, setResult] = useState<ScoreResult | null>(null);
+  const [result, setResult] = useState<ScoringResult | null>(null);
 
-  // Simulate counter increasing
   useEffect(() => {
     const interval = setInterval(() => {
       setCounter(prev => prev + Math.floor(Math.random() * 3) + 1);
@@ -40,7 +33,6 @@ export default function Home() {
     setFormData(data);
     setState('loading');
 
-    // Calculate after loading completes (12 seconds)
     setTimeout(() => {
       const scoreResult = calculateScore(data.puesto, data.sector, data.experiencia);
       setResult(scoreResult);
@@ -64,11 +56,10 @@ export default function Home() {
 
       {state === 'result' && result && formData && (
         <Result
-          score={result.score}
-          timeline={result.timeline}
-          riskLevel={result.riskLevel}
-          factors={result.factors}
+          {...result}
           puesto={formData.puesto}
+          sector={formData.sector}
+          experiencia={formData.experiencia}
           onEmailGate={() => setState('emailGate')}
         />
       )}

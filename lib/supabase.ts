@@ -16,6 +16,7 @@ export interface Submission {
   sector: string;
   experiencia: number;
   score: number;
+  risk_level?: string;
 }
 
 export async function saveSubmission(data: Submission): Promise<boolean> {
@@ -33,6 +34,7 @@ export async function saveSubmission(data: Submission): Promise<boolean> {
         sector: data.sector,
         experiencia: data.experiencia,
         score: data.score,
+        risk_level: data.risk_level || '',
         created_at: new Date().toISOString(),
       },
     ]);

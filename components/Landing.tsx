@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { getJobSuggestions, getSectors } from '@/lib/scoring';
 
 interface LandingProps {
@@ -11,7 +11,7 @@ interface LandingProps {
 export default function Landing({ onSubmit, counter }: LandingProps) {
   const [puesto, setPuesto] = useState('');
   const [sector, setSector] = useState('tecnología');
-  const [experiencia, setExperiencia] = useState('5');
+  const [experiencia, setExperiencia] = useState(5);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,14 +40,22 @@ export default function Landing({ onSubmit, counter }: LandingProps) {
     if (!puesto.trim()) return;
 
     setIsLoading(true);
-    // Simulate a small delay for UX
     setTimeout(() => {
       onSubmit({
         puesto: puesto.trim(),
         sector,
-        experiencia: parseInt(experiencia, 10),
+        experiencia,
       });
     }, 200);
+  };
+
+  const getExpLabel = () => {
+    if (experiencia === 0) return 'Sin experiencia';
+    if (experiencia <= 2) return 'Junior';
+    if (experiencia <= 5) return 'Mid-level';
+    if (experiencia <= 10) return 'Senior';
+    if (experiencia <= 20) return 'Veterano';
+    return 'Experto';
   };
 
   return (
@@ -55,6 +63,7 @@ export default function Landing({ onSubmit, counter }: LandingProps) {
       <div className="w-full max-w-md animate-fade-in">
         {/* Main Headline */}
         <div className="text-center mb-8">
+          <div className="text-5xl mb-4">🤖</div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent leading-tight">
             ¿La IA va a reemplazar tu trabajo?
           </h1>
@@ -78,7 +87,7 @@ export default function Landing({ onSubmit, counter }: LandingProps) {
                 if (suggestions.length > 0) setShowSuggestions(true);
               }}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-              placeholder="Ej: programador, diseñador..."
+              placeholder="Ej: programador, médico, diseñador..."
               className="input-field"
               required
             />
@@ -89,7 +98,7 @@ export default function Landing({ onSubmit, counter }: LandingProps) {
                     key={idx}
                     type="button"
                     onClick={() => selectSuggestion(suggestion)}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-700 text-gray-200 first:rounded-t-lg last:rounded-b-lg transition-colors duration-150"
+                    className="w-full text-left px-4 py-2.5 hover:bg-gray-700 text-gray-200 first:rounded-t-lg last:rounded-b-lg transition-colors duration-150 capitalize"
                   >
                     {suggestion}
                   </button>
@@ -116,19 +125,27 @@ export default function Landing({ onSubmit, counter }: LandingProps) {
             </select>
           </div>
 
-          {/* Experiencia */}
+          {/* Experiencia Slider */}
           <div>
             <label className="block text-sm font-semibold text-gray-200 mb-2">
               Años de experiencia: <span className="text-purple-400">{experiencia}</span>
+              <span className="text-gray-500 font-normal ml-2">({getExpLabel()})</span>
             </label>
             <input
-              type="number"
+              type="range"
               value={experiencia}
-              onChange={(e) => setExperiencia(e.target.value)}
+              onChange={(e) => setExperiencia(parseInt(e.target.value, 10))}
               min="0"
-              max="40"
-              className="input-field"
+              max="30"
+              step="1"
+              className="w-full h-2 bg-gray-800 rounded-full appearance-none cursor-pointer accent-purple-500"
             />
+            <div className="flex justify-between text-xs text-gray-600 mt-1">
+              <span>0</span>
+              <span>10</span>
+              <span>20</span>
+              <span>30</span>
+            </div>
           </div>
 
           {/* CTA Button */}
@@ -160,8 +177,8 @@ export default function Landing({ onSubmit, counter }: LandingProps) {
       </div>
 
       {/* Footer */}
-      <div className="absolute bottom-6 text-center">
-        <p className="text-gray-500 text-sm">Hecho con ❤️ y AI</p>
+      <div className="mt-12 text-center">
+        <p className="text-gray-600 text-sm">Hecho con ❤️ y AI</p>
       </div>
     </div>
   );
